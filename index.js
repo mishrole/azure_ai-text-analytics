@@ -113,7 +113,6 @@ async function recognizeEntities(client) {
 recognizeEntities(textAnalyticsClient);
 
 // * Recognize linked entities
-
 async function recognizeLinkedEntities(client) {
   const linkedEntitiesInput = [
     'El incremento en los índices de sobrepeso y obesidad en el Perú es alarmante, según el Instituto Nacional de Estadística e Informática (INEI).',
@@ -145,3 +144,36 @@ async function recognizeLinkedEntities(client) {
 }
 
 recognizeLinkedEntities(textAnalyticsClient);
+
+// * Detect language
+
+async function detectLanguage(client) {
+  const detectLanguageInput = [
+    'Este es un documento escrito en español.',
+    'This is a document written in English.',
+    'Isto é um documento escrito em português.',
+  ];
+
+  const detectLanguageResult = await client.detectLanguage(detectLanguageInput, 'none');
+
+  for (const result of detectLanguageResult) {
+    if (result.error === undefined) {
+      const { primaryLanguage } = result;
+      console.log(
+        "Input #",
+        result.id,
+        "identified as",
+        primaryLanguage.name,
+        "( ISO6391:",
+        primaryLanguage.iso6391Name,
+        ", Score:",
+        primaryLanguage.confidenceScore,
+        ")"
+      );
+    } else {
+      console.error("Encountered an error:", result.error);
+    }
+  }
+}
+
+detectLanguage(textAnalyticsClient);
