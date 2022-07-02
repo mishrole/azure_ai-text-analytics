@@ -123,7 +123,9 @@ async function recognizeLinkedEntities(client) {
   const linkedEntitiesResult = await client.recognizeLinkedEntities(linkedEntitiesInput, language);
 
   for (const result of linkedEntitiesResult) {
-    if (result.error === undefined) {
+    if (result.error) {
+      console.error("Encountered an error:", result.error);
+    } else {
       console.log(" -- Recognized linked entities for input", result.id, "--");
       for (const entity of result.entities) {
         console.log(entity.name, "(URL:", entity.url, ", Source:", entity.dataSource, ")");
@@ -137,8 +139,6 @@ async function recognizeLinkedEntities(client) {
           );
         }
       }
-    } else {
-      console.error("Encountered an error:", result.error);
     }
   }
 }
@@ -146,7 +146,6 @@ async function recognizeLinkedEntities(client) {
 recognizeLinkedEntities(textAnalyticsClient);
 
 // * Detect language
-
 async function detectLanguage(client) {
   const detectLanguageInput = [
     'Este es un documento escrito en español.',
@@ -157,7 +156,9 @@ async function detectLanguage(client) {
   const detectLanguageResult = await client.detectLanguage(detectLanguageInput, 'none');
 
   for (const result of detectLanguageResult) {
-    if (result.error === undefined) {
+    if (result.error) {
+      console.error("Encountered an error:", result.error);
+    } else {
       const { primaryLanguage } = result;
       console.log(
         "Input #",
@@ -170,10 +171,30 @@ async function detectLanguage(client) {
         primaryLanguage.confidenceScore,
         ")"
       );
-    } else {
-      console.error("Encountered an error:", result.error);
     }
   }
 }
 
 detectLanguage(textAnalyticsClient);
+
+// * Extract key phrases
+async function extractKeyPhrases(client) {
+  const extractKeyPhrasesInput = [
+    'El incremento en los índices de sobrepeso y obesidad en el Perú es alarmante, según el Instituto Nacional de Estadística e Informática (INEI).',
+    'Sólo en junio de 2020, el Ministerio de Salud alertaba que el 85% de las muertes por COVID-19 hasta esa fecha fueron de personas con obesidad.',
+    'En este sentido, hablamos de una crisis de salud alimentaria que afecta a toda la población, con incidencia en las áreas urbanas.',
+  ];
+
+  const extractKeyPhrasesResult = await client.extractKeyPhrases(extractKeyPhrasesInput, language);
+
+  for (const result of extractKeyPhrasesResult) {
+    if (result.error) {
+      console.error('Encountered an error:', result.error);
+    } else {
+      console.log(' -- Extract key phrases for input', result.id, '--');
+      console.log(result.keyPhrases);
+    }
+  }
+}
+
+extractKeyPhrases(textAnalyticsClient);
